@@ -22,7 +22,6 @@ from torchvision.models import resnet50 as torch_resnet50
 from torchvision.models import vgg16_bn, vgg19
 from torchvision.models import vgg11, vgg11_bn, inception_v3
 
-import lmc_source.utils
 from lmc_source.utils.utils import load_model
 
 CIFAR10_MODELS = ['resnet20', 'resnet32', 'resnet44', 'resnet56', 'resnet20_sw', 'resnet32_sw', 'resnet44_sw', 'resnet56_sw', 'resnet20_mixed', 'cifarnet']

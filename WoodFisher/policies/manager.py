@@ -41,8 +41,6 @@ import copy
 import random
 import sys
 
-import lmc_source
-
 
 USE_TQDM = True
 if not USE_TQDM:

@@ -3,7 +3,6 @@ Implement Pruners here.
 
 """
 import numpy as np
-from lmc_source.od.models.utils import Sequential
 
 from policies.policy import PolicyBase
 from utils import (get_total_sparsity, 

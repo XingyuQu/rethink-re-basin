@@ -65,7 +65,7 @@ class ResNet(nn.Module):
         if norm == 'bn':
             norm_layer = nn.BatchNorm2d
         elif norm == 'ln':
-            norm_layer = nn.LayerNorm
+            norm_layer = LayerNorm
         else:
             raise ValueError(f'Invalid norm: {norm}')
 
@@ -134,21 +134,12 @@ class ResNet(nn.Module):
                     nn.init.constant_(m.weight, 1)
                     nn.init.constant_(m.bias, 0)
 
-    def forward(self, x, sampler=None):
-        if sampler is None:
-            out = self.relu1(self.norm1(self.conv1(x)))
-            out = self.segments(out)
-            out = F.avg_pool2d(out, out.size()[3])
-            out = out.view(out.size(0), -1)
-            out = self.fc(out)
-        else:
-            out = self.relu1(self.norm1(self.conv1(x, sampler())))
-            for segment in self.segments:
-                for block in segment:
-                    out = block(out, sampler)
-            out = F.avg_pool2d(out, out.size()[3])
-            out = out.view(out.size(0), -1)
-            out = self.fc(out, None)
+    def forward(self, x):
+        out = self.relu1(self.norm1(self.conv1(x)))
+        out = self.segments(out)
+        out = F.avg_pool2d(out, out.size()[3])
+        out = out.view(out.size(0), -1)
+        out = self.fc(out)
         return out
 
     def forward_hook(self, layer_name, pre_act=False):

@@ -1,21 +1,11 @@
-"""Based on:
-(open_lth)
-Ordered ResNet in PyTorch
+"""Based on: https://github.com/facebookresearch/open_lth/blob/main/models/cifar_resnet.py
 """
 
-from typing import Any
-
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
-# import math
-import numpy as np
-
-from .utils import create_conv2d_layer, create_linear_layer, Sequential
-from ..layers import ODConv2d, BatchNorm2d, LayerNorm
+import math
 
 
-# TODO: different initialization methods?
 class ResNet(nn.Module):
     """A residual neural network as originally designed for CIFAR-10."""
 
@@ -23,58 +13,45 @@ class ResNet(nn.Module):
         """A ResNet block."""
 
         def __init__(self, f_in: int, f_out: int, downsample=False,
-                     with_od=False):
+                     bias=True):
             super(ResNet.Block, self).__init__()
-            self.f_in = f_in
-            self.f_out = f_out
-            self.downsample = downsample
 
             stride = 2 if downsample else 1
-            self.bias1a = nn.Parameter(torch.zeros(1))
-            self.conv1 = create_conv2d_layer(
-                with_od, f_in, f_out, kernel_size=3, stride=stride,
-                padding=1, bias=False)
-            self.bias1b = nn.Parameter(torch.zeros(1))
+            self.conv1 = nn.Conv2d(
+                f_in, f_out, kernel_size=3, stride=stride,
+                padding=1, bias=bias)
             self.relu1 = nn.ReLU()
-            self.bias2a = nn.Parameter(torch.zeros(1))
-            self.conv2 = create_conv2d_layer(
-                with_od, f_out, f_out, kernel_size=3, stride=1,
-                padding=1, bias=False)
-            self.scale = nn.Parameter(torch.ones(1))
-            self.bias2b = nn.Parameter(torch.zeros(1))
+            self.conv2 = nn.Conv2d(
+                f_out, f_out, kernel_size=3, stride=1,
+                padding=1, bias=bias)
             self.relu2 = nn.ReLU()
 
             # No parameters for shortcut connections.
             if downsample or f_in != f_out:
-                self.shortcut = Sequential(
-                    create_conv2d_layer(
-                        with_od, f_in, f_out, kernel_size=1,
-                        stride=2, bias=False),
+                self.shortcut = nn.Sequential(
+                    nn.Conv2d(
+                        f_in, f_out, kernel_size=1,
+                        stride=2, bias=False)
                 )
             else:
-                self.shortcut = Sequential()
+                self.shortcut = nn.Sequential()
 
         def forward(self, x):
-            out = self.relu1(self.conv1(x + self.bias1a) + self.bias1b)
-            out = self.conv2(out + self.bias2a) * self.scale + self.bias2b
-            if self.downsample or self.f_in != self.f_out:
-                out += self.shortcut(x + self.bias1a)
-            else:
-                out += self.shortcut(x)
+            out = self.relu1(self.conv1(x))
+            out = self.conv2(out)
+            out += self.shortcut(x)
             return self.relu2(out)
 
-    def __init__(self, plan, num_classes=None, with_od=False,
-                 special_init=None):
+    def __init__(self, plan, num_classes=None,
+                 special_init=None, bias=True):
         super(ResNet, self).__init__()
         num_classes = num_classes or 10
-        self.num_layers = plan[0][1] + plan[1][1] + plan[2][1]
 
         # Initial convolution.
         current_filters = plan[0][0]
-        self.conv1 = create_conv2d_layer(
-            with_od, 3, current_filters, kernel_size=3, stride=1,
-            padding=1, bias=False)
-        self.bias1 = nn.Parameter(torch.zeros(1))
+        self.conv1 = nn.Conv2d(
+            3, current_filters, kernel_size=3, stride=1,
+            padding=1, bias=bias)
         self.relu1 = nn.ReLU()
 
         # The subsequent blocks of the ResNet.
@@ -84,31 +61,56 @@ class ResNet(nn.Module):
             for block_index in range(num_blocks):
                 downsample = segment_index > 0 and block_index == 0
                 blocks.append(ResNet.Block(current_filters, filters,
-                                           downsample, with_od))
+                                           downsample,
+                                           bias=bias))
                 current_filters = filters
-            blocks = Sequential(*blocks)
+            blocks = nn.Sequential(*blocks)
             segments.append(blocks)
-        self.segments = Sequential(*segments)
+        self.segments = nn.Sequential(*segments)
 
-        self.bias2 = nn.Parameter(torch.zeros(1))
         # Final fc layer. Size = number of filters in last segment.
-        self.fc = create_linear_layer(with_od, plan[-1][0], num_classes,
-                                      od_layer=False)
+        self.fc = nn.Linear(plan[-1][0], num_classes,
+                            bias=bias)
 
-        for m in self.modules():
-            if isinstance(m, self.Block):
-                nn.init.normal_(m.conv1.weight, mean=0, std=np.sqrt(2 / (m.conv1.weight.shape[0] * np.prod(m.conv1.weight.shape[2:]))) * self.num_layers ** (-0.5))
-                nn.init.constant_(m.conv2.weight, 0)
-            elif isinstance(m, nn.Linear):
-                nn.init.constant_(m.weight, 0)
-                nn.init.constant_(m.bias, 0)
+        if special_init is not None:
+            for m in self.modules():
+                # conv layer
+                if isinstance(m, nn.Conv2d):
+                    if special_init == 'vgg_init':
+                        nn.init.kaiming_normal_(
+                            m.weight, mode="fan_out", nonlinearity="relu")
+                        if m.bias is not None:
+                            nn.init.constant_(m.bias, 0)
+                    elif special_init == 'lecun_normal':
+                        # lecun_normal init, same as flax
+                        F_in = m.weight.size(1) * m.weight.size(2) *\
+                            m.weight.size(3)
+                        nn.init.normal_(m.weight, mean=0.,
+                                        std=math.sqrt(1./F_in))
+                        # zero init bias, same as flax
+                        if m.bias is not None:
+                            nn.init.constant_(m.bias, 0)
+                # linear layer
+                elif isinstance(m, nn.Linear):
+                    if special_init == 'vgg_init':
+                        nn.init.normal_(m.weight, 0, 0.01)
+                        if m.bias is not None:
+                            nn.init.constant_(m.bias, 0)
+                    elif special_init == 'lecun_normal':
+                        # lecun_normal init, same as flax
+                        F_in = m.weight.size(1)
+                        nn.init.normal_(m.weight, mean=0.,
+                                        std=math.sqrt(1./F_in))
+                        # zero init bias, same as flax
+                        if m.bias is not None:
+                            nn.init.constant_(m.bias, 0)
 
     def forward(self, x):
-        out = self.relu1(self.conv1(x) + self.bias1)
+        out = self.relu1(self.conv1(x))
         out = self.segments(out)
         out = F.avg_pool2d(out, out.size()[3])
         out = out.view(out.size(0), -1)
-        out = self.fc(out + self.bias2)
+        out = self.fc(out)
         return out
 
     def forward_hook(self, layer_name, pre_act=False):
@@ -137,7 +139,7 @@ class ResNet(nn.Module):
         return self
 
     @staticmethod
-    def get_model_from_name(model_name, num_classes=10, with_od=False,
+    def get_model_from_name(model_name, num_classes=10,
                             special_init=None):
         """The naming scheme for a ResNet is 'cifar_resnet_N[_W]'.
 
@@ -165,5 +167,11 @@ class ResNet(nn.Module):
         D = (D - 2) // 6
         plan = [(W, D), (2*W, D), (4*W, D)]
 
-        return ResNet(plan, num_classes, with_od=with_od,
-                      special_init=special_init)
+        if 'nobias' in model_name:
+            bias = False
+        else:
+            bias = True
+
+        return ResNet(plan, num_classes,
+                      special_init=special_init,
+                      bias=bias)

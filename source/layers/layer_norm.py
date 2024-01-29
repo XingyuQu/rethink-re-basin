@@ -13,8 +13,8 @@ class LayerNorm(nn.LayerNorm):
     def forward(self, input: Tensor) -> Tensor:
         input = input.permute(0, 2, 3, 1)
         num_channels = input.size(-1)
-        out = F.layer_norm(input, [num_channels], self.weight[:num_channels],
-                           self.bias[:num_channels], self.eps)
+        out = F.layer_norm(input, [num_channels], self.weight,
+                           self.bias, self.eps)
         # numerator = input - input.mean(-1, keepdim=True)
         # denominator = torch.sqrt(input.var(-1, keepdim=True, correction=0) + self.eps)
         # out = (numerator / denominator) * self.weight + self.bias

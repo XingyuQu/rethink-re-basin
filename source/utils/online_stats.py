@@ -1,8 +1,5 @@
-"""
-Online-ish Pearson correlation of all n x n variable pairs simultaneously.
-Adapt from git re-basin repo:
-https://github.com/samuela/git-re-basin/blob/main/src/online_stats.py.
-Modify the original code from jax to pytorch.
+"""Based on: https://github.com/themrzmaster/git-re-basin-pytorch
+    and https://github.com/samuela/git-re-basin
 """
 import torch
 
