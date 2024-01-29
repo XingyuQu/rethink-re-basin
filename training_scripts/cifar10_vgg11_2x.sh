@@ -6,7 +6,7 @@ seed=20
 
 cd	../
 python	run_ex.py	\
---project	icml2024_rethink	\
+--project	rethink_re_basin	\
 --run-name	"cifar10_vgg11_2x_seed_${seed}"	\
 --model	${model}	\
 --dataset	${dataset}	\
