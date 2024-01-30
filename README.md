@@ -1,6 +1,6 @@
 # Rethink Model Re-Basin and the Linear Mode Connectivity
 
-This repository contains PyTorch code for results presented in the paper: *Rethink Model Re-Basin and the Linear Mode Connectivity*.
+This repository contains PyTorch implementation for results presented in the paper: *Rethink Model Re-Basin and the Linear Mode Connectivity*.
 
 ## Structure of the repo
 
@@ -8,18 +8,18 @@ This repository contains PyTorch code for results presented in the paper: *Rethi
 * `run_training.py` is similar to `run_ex.py`, but only trains a single model at a time. It can be utilized for training a model with large width.
 * `training_scripts/` contains bash scripts for training models, including all the hyper-parameter settings.
 * `source/` contains source code for model, dataset, training, matching, etc.
+  * `source/utils/fim.py` is adpted from [fim.py](https://github.com/tudor-berariu/fisher-information-matrix/blob/master/fim.py), contaning code for calculating the Fisher Information.
+  * `source/utils/opts.py` contains code for parsing arguments.
   * `source/utils/weight_matching/` contains code for weight matching.
   * `source/utils/activation_matching/` contains code for activation pruning.
   * `source/utils/connect/` contains code for re-normalization and interpolation.
-  * `source/utils/fim.py` is adpted from [fim.py](https://github.com/tudor-berariu/fisher-information-matrix/blob/master/fim.py), contaning code for calculating the Fisher Information.
-  * `source/utils/opts.py` contains code for parsing arguments.
 * `notebooks/` contains notebooks to reproduce the results (except some in pruning) presented in the paper. It contains the least code to showcase all the functionalities of the repo and can be easily extended to all the settings.
 * `WoodFisher/` is adapted from [WoodFisher](https://github.com/IST-DASLab/WoodFisher) for pruning experiemnts. A complete description of the repo can be found there.
   * `WoodFisher/main.py` is the main file to run pruning from.
+  * `WoodFisher/transfer_checkpoint.ipynb` contains the code to transfer pre-trained checkpoint produced in our code to fit the WoodFisher pruning code.
   * `WoodFisher/checkpoints` is used to store the pre-trained models for the later pruning.
   * `WoodFisher/configs` contains yaml config files used for specifying training and pruning schedules. In our work, we only utilize the pruning schedules.
   * `WoodFisher/scripts` contains the all bash scripts for pruning to reproduce the results in the paper.
-  * `WoodFisher/transfer_checkpoint` contains the code to transfer pre-trained checkpoint produced in our code to fit the WoodFisher pruning code.
   * `WoodFisher/record_pruning` contains the code for visualizing the results after pruning.
   * `WoodFisher/lmc_source` contains edited code from our repo for applying re-normalization after pruning.
 
@@ -63,6 +63,8 @@ We refer a complete description to the original repo: [WoodFisher](https://githu
 ## WoodFisher
 
 The pruning results reported in the paper are conducted based on the framework in [WoodFisher](https://github.com/IST-DASLab/WoodFisher). Code is stored in `WoodFisher`. We manually edit some code in the original repo to force a one-shot pruning and remove some irrelevant feautres, especially for the `WoodFisher/policies/manager.py` file, while this can also be done by modifying the pruning settings in the scripts. The original file is retained in `WoodFisher/policies/manager_ori.py`. For applying re-normalization after pruning, we merged a modified version of our code with the repo, sotred in `WoodFisher/lmc_source/`. Several lines of code are also added to `WoodFisher/policies/manager.py`. This can be used as an example to merge our code with other pruning frameworks.
+
+We release pre-trained checkpoints for re-producing the pruning results reported in the paper: . These checkpoints were already transferred and hence there is no need to run the `WoodFisher/transfer_checkpoint.ipynb`.
 
 ### Setup
 
