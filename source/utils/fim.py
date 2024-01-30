@@ -1,7 +1,8 @@
+"""Adapted from: https://github.com/tudor-berariu/fisher-information-matrix/blob/master/fim.py"""
+
 import time
 import sys
 from typing import Dict
-from argparse import Namespace
 
 import torch
 from torch import Tensor
