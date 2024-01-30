@@ -1,9 +1,10 @@
+"""Based on: """
+
 import torch.nn as nn
 import torch
 from einops import rearrange
 from scipy.optimize import linear_sum_assignment
 
-# from source.od.models.vgg import vgg16
 import source.utils.weight_matching as wm
 from source.utils.online_stats import OnlineMean, OnlineCovariance, OnlineCovariance_Git
 
