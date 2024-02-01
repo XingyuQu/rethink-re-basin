@@ -64,7 +64,7 @@ We refer a complete description to the original repo: [WoodFisher](https://githu
 
 The pruning results reported in the paper are conducted based on the framework in [WoodFisher](https://github.com/IST-DASLab/WoodFisher). Code is stored in `WoodFisher`. We manually edit some code in the original repo to force a one-shot pruning and remove some irrelevant feautres, especially for the `WoodFisher/policies/manager.py` file, while this can also be done by modifying the pruning settings in the scripts. The original file is retained in `WoodFisher/policies/manager_ori.py`. For applying re-normalization after pruning, we merged a modified version of our code with the repo, sotred in `WoodFisher/lmc_source/`. Several lines of code are also added to `WoodFisher/policies/manager.py`. This can be used as an example to merge our code with other pruning frameworks.
 
-We release pre-trained checkpoints for re-producing the pruning results reported in the paper: . These checkpoints were already transferred and hence there is no need to run the `WoodFisher/transfer_checkpoint.ipynb`.
+We'll release pre-trained checkpoints for re-producing the pruning results reported in the paper soon. These checkpoints were already transferred and hence there is no need to run the `WoodFisher/transfer_checkpoint.ipynb`.
 
 ### Setup
 
