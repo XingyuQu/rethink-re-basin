@@ -66,6 +66,8 @@ The pruning results reported in the paper are conducted based on the framework i
 
 We'll release pre-trained checkpoints for re-producing the pruning results reported in the paper soon. These checkpoints were already transferred and hence there is no need to run the `WoodFisher/transfer_checkpoint.ipynb`.
 
+We also provide an simple and self-contained example to showcase how to apply re-normalization after pruning in `notebooks/renormalize_pruned_model.ipynb`. It uses `torch.nn.utils.prune` to prune the model and then applies re-normalization.
+
 ### Setup
 
 We replicate the setup of the original repo in the following.
