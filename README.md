@@ -58,13 +58,13 @@ We refer a complete description to the original repo: [WoodFisher](https://githu
 * `DATA_DIR`: The dataset directory.
 * `PRUNERS`: The pruners to use. Option: `woodfisherblock` `globalmagni` `magni` `diagfisher`
 * `--num-samples`: The number of samples to use for applying re-normalization. Default is `None`.
-* `--from_checkpoint_path`: The path to the pre-trained checkpoint.
+* `--from-checkpoint-path`: The path to the pre-trained checkpoint.
 
 ## WoodFisher
 
 The pruning results reported in the paper are conducted based on the framework in [WoodFisher](https://github.com/IST-DASLab/WoodFisher). Code is stored in `WoodFisher`. We manually edit some code in the original repo to force a one-shot pruning and remove some irrelevant feautres, especially for the `WoodFisher/policies/manager.py` file, while this can also be done by modifying the pruning settings in the scripts. The original file is retained in `WoodFisher/policies/manager_ori.py`. For applying re-normalization after pruning, we merged a modified version of our code with the repo, sotred in `WoodFisher/lmc_source/`. Several lines of code are also added to `WoodFisher/policies/manager.py`. This can be used as an example to merge our code with other pruning frameworks.
 
-We'll release pre-trained checkpoints for re-producing the pruning results reported in the paper soon. These checkpoints were already transferred and hence there is no need to run the `WoodFisher/transfer_checkpoint.ipynb`.
+We [release](https://drive.google.com/drive/folders/1gTbeAzuJq7tZuSA5ybmiVZSz33cuy15q?usp=sharing) pre-trained checkpoints for re-producing the pruning results reported in the paper. These checkpoints were already transferred and hence there is no need to run the `WoodFisher/transfer_checkpoint.ipynb`.
 
 We also provide an simple and self-contained example to showcase how to apply re-normalization after pruning in `notebooks/renormalize_pruned_model.ipynb`. It uses `torch.nn.utils.prune` to prune the model and then applies re-normalization.
 
