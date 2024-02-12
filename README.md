@@ -1,6 +1,6 @@
 # Rethink Model Re-Basin and the Linear Mode Connectivity
 
-This repository contains PyTorch implementation for results presented in the paper: *Rethink Model Re-Basin and the Linear Mode Connectivity*.
+This repository contains PyTorch implementation for results presented in the paper: [*Rethink Model Re-Basin and the Linear Mode Connectivity*](https://arxiv.org/abs/2402.05966).
 
 ## Structure of the repo
 
