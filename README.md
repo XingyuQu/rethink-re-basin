@@ -99,5 +99,10 @@ pip install future
 This codebase corresponds to the paper: *Rethink Model Re-Basin and the Linear Mode Connectivity*. If you use any of the code or provided models for your research, please consider citing the paper as
 
 ```bibtex
-TODO
+@article{qu2024rethink,
+  title={Rethink Model Re-Basin and the Linear Mode Connectivity},
+  author={Qu, Xingyu and Horvath, Samuel},
+  journal={arXiv preprint arXiv:2402.05966},
+  year={2024}
+}
 ```
