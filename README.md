@@ -2,6 +2,8 @@
 
 This repository contains PyTorch implementation for results presented in the paper: [*Rethink Model Re-Basin and the Linear Mode Connectivity*](https://arxiv.org/abs/2402.05966).
 
+**Update (01/25): A new version of the paper is updated on arXiv (same link), where a more in-depth study is performed. The accompanying code is published at this [repo](https://github.com/XingyuQu/VF).**
+
 ## Structure of the repo
 
 * `run_ex.py` is the main file for training models. It trains a pair of models simultaneously.
